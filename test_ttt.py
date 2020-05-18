@@ -9,6 +9,7 @@ def test_starting_board():
         ...
         ...
         """).strip()
+    assert board.state == 'still playing'
 
 def test_first_turn_is_X():
     board = ttt.Board()
@@ -70,9 +71,20 @@ def test_third_turn():
         """).strip()
 
 
-@pytest.mark.xfail()
 def test_cannot_play_on_already_played_position():
     board0 = ttt.Board()
     board1 = board0.take_turn(1,1)
     with pytest.raises(Exception):
         board1.take_turn(1,1)
+
+
+def test_win_horizonal_X():
+    board = ttt.Board(Xs=[(0,0), (1,0), (2,0)])
+    print(board.draw())
+    assert board.state == 'X wins'
+
+
+def test_win_horizonal_O():
+    board = ttt.Board(Os=[(0,0), (1,0), (2,0)])
+    print(board.draw())
+    assert board.state == 'O wins'

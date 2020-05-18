@@ -17,8 +17,17 @@ class Board:
             result += '\n'
         return result.strip()
 
+
+    @property
+    def state(self):
+        if 'XXX' in self.draw():
+            return 'X wins'
+        if 'OOO' in self.draw():
+            return 'O wins'
+        return 'still playing'
+
     def take_turn(self, x, y):
+        assert (x,y) not in self.Xs + self.Os
         if self.Xs <= self.Os:
             return Board(self.Xs + [(x,y)], self.Os)
         return Board(self.Xs, self.Os + [(x, y)])
-
