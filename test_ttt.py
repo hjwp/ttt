@@ -88,3 +88,29 @@ def test_win_horizonal_O():
     board = ttt.Board(Os=[(0,0), (1,0), (2,0)])
     print(board.draw())
     assert board.state == 'O wins'
+
+def test_win_vertical_X():
+    board = ttt.Board(Xs=[(0,0), (0,1), (0,2)])
+    print(board.draw())
+    assert board.state == 'X wins'
+
+def test_win_vertical_O():
+    board = ttt.Board(Os=[(0,0), (0,1), (0,2)])
+    print(board.draw())
+    assert board.state == 'O wins'
+
+def test_win_diagonal_X():
+    board = ttt.Board(Xs=[(0,0), (1,1), (2,2)])
+    print(board.draw())
+    assert board.state == 'X wins'
+
+def test_win_diagonal_O():
+    board = ttt.Board(Os=[(2,0), (1,1), (0,2)])
+    print(board.draw())
+    assert board.state == 'O wins'
+
+
+@pytest.mark.skip()
+def test_draw():
+    ...
+    assert board.state == 'draw'
