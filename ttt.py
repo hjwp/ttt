@@ -1,16 +1,35 @@
+from typing import List
+from dataclasses import dataclass
+
+@dataclass
+class Position:
+    x: int
+    y: int
+
+
+class Positions(list):
+    def __init__(self, positions: List[Position]):
+        super().__init__(positions)
+
+    def __add__(self, other):
+        return Positions(list(self) + other)
+
+    # def __lte__(self, other):
+    #     return super().__lte__(list(other))
+
 
 class Board:
     def __init__(self, Xs=None, Os=None):
-        self.Xs = Xs or []
-        self.Os = Os or []
+        self.Xs = Positions(Xs or [])
+        self.Os = Positions(Os or [])
 
     def draw(self):
         result = ''
         for y in range(3):
             for x in range(3):
-                if (x, y) in self.Xs:
+                if Position(x, y) in self.Xs:
                     result += 'X'
-                elif (x, y) in self.Os:
+                elif Position(x, y) in self.Os:
                     result += 'O'
                 else:
                     result += '.'
@@ -20,11 +39,11 @@ class Board:
 
     @property
     def state(self):
-        rows = [[(0,y), (1,y), (2,y)] for y in range(3)]
-        cols = [[(x,0), (x,1), (x,2)] for x in range(3)]
+        rows = [[Position(0,y), Position(1,y), Position(2,y)] for y in range(3)]
+        cols = [[Position(x,0), Position(x,1), Position(x,2)] for x in range(3)]
         diags = [
-            [(0,0), (1,1), (2,2)],
-            [(0,2), (1,1), (2,0)],
+            [Position(0,0), Position(1,1), Position(2,2)],
+            [Position(0,2), Position(1,1), Position(2,0)],
         ]
 
         for positions in rows + cols + diags:
@@ -36,8 +55,14 @@ class Board:
             return 'draw'
         return 'still playing'
 
-    def take_turn(self, x, y):
-        assert (x,y) not in self.Xs + self.Os
-        if self.Xs <= self.Os:
-            return Board(self.Xs + [(x,y)], self.Os)
-        return Board(self.Xs, self.Os + [(x, y)])
+    def take_turn(self, position):
+        assert position not in self.Xs + self.Os
+        if len(self.Xs) <= len(self.Os):
+            return Board(
+                Xs=Positions(self.Xs + [Position(position.x,position.y)]),
+                Os=Positions(self.Os)
+            )
+        return Board(
+            Xs=Positions(self.Xs),
+            Os=Positions(self.Os + [Position(position.x, position.y)])
+        )
