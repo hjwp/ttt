@@ -1,10 +1,22 @@
 from typing import List
 from dataclasses import dataclass
+from enum import Enum
+
+class Rows(Enum):
+    TOP = 1
+    MIDDLE = 2
+    BOTTOM = 3
+
+class Cols(Enum):
+    LEFT = 1
+    MIDDLE = 2
+    RIGHT = 3
 
 @dataclass
 class Position:
-    x: int
-    y: int
+    col: Cols
+    row: Rows
+
 
 
 class Positions(list):
@@ -14,8 +26,11 @@ class Positions(list):
     def __add__(self, other):
         return Positions(list(self) + other)
 
-    # def __lte__(self, other):
-    #     return super().__lte__(list(other))
+ALL_POSITIONS = [
+    Position(c, r)
+    for r in Rows
+    for c in Cols
+]
 
 
 class Board:
@@ -25,25 +40,31 @@ class Board:
 
     def draw(self):
         result = ''
-        for y in range(3):
-            for x in range(3):
-                if Position(x, y) in self.Xs:
-                    result += 'X'
-                elif Position(x, y) in self.Os:
-                    result += 'O'
-                else:
-                    result += '.'
-            result += '\n'
+        for p in ALL_POSITIONS:
+            if p in self.Xs:
+                result += 'X'
+            elif p in self.Os:
+                result += 'O'
+            else:
+                result += '.'
+            if p.col is Cols.RIGHT:
+                result += '\n'
         return result.strip()
 
 
     @property
     def state(self):
-        rows = [[Position(0,y), Position(1,y), Position(2,y)] for y in range(3)]
-        cols = [[Position(x,0), Position(x,1), Position(x,2)] for x in range(3)]
+        rows = [
+            [Position(Cols.LEFT,y), Position(Cols.MIDDLE,y), Position(Cols.RIGHT,y)]
+            for y in Rows
+        ]
+        cols = [
+            [Position(x,Rows.TOP), Position(x,Rows.MIDDLE), Position(x,Rows.BOTTOM)]
+            for x in Cols
+        ]
         diags = [
-            [Position(0,0), Position(1,1), Position(2,2)],
-            [Position(0,2), Position(1,1), Position(2,0)],
+            [Position(Cols.LEFT,Rows.TOP), Position(Cols.MIDDLE,Rows.MIDDLE), Position(Cols.RIGHT,Rows.BOTTOM)],
+            [Position(Cols.LEFT,Rows.BOTTOM), Position(Cols.MIDDLE,Rows.MIDDLE), Position(Cols.RIGHT,Rows.TOP)],
         ]
 
         for positions in rows + cols + diags:
@@ -59,10 +80,10 @@ class Board:
         assert position not in self.Xs + self.Os
         if len(self.Xs) <= len(self.Os):
             return Board(
-                Xs=Positions(self.Xs + [Position(position.x,position.y)]),
+                Xs=Positions(self.Xs + [position]),
                 Os=Positions(self.Os)
             )
         return Board(
             Xs=Positions(self.Xs),
-            Os=Positions(self.Os + [Position(position.x, position.y)])
+            Os=Positions(self.Os + [position])
         )
