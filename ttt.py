@@ -26,11 +26,6 @@ class Positions(list):
     def __add__(self, other):
         return Positions(list(self) + other)
 
-ALL_POSITIONS = [
-    Position(c, r)
-    for r in Rows
-    for c in Cols
-]
 
 
 class Board:
@@ -40,7 +35,12 @@ class Board:
 
     def draw(self):
         result = ''
-        for p in ALL_POSITIONS:
+        all_positions = [
+            Position(c, r)
+            for r in Rows
+            for c in Cols
+        ]
+        for p in all_positions:
             if p in self.Xs:
                 result += 'X'
             elif p in self.Os:
@@ -54,23 +54,21 @@ class Board:
 
     @property
     def state(self):
-        rows = [
-            [Position(Cols.LEFT,y), Position(Cols.MIDDLE,y), Position(Cols.RIGHT,y)]
-            for y in Rows
+        complete_rows = [
+            [Position(c, r) for c in Cols] for r in Rows
         ]
-        cols = [
-            [Position(x,Rows.TOP), Position(x,Rows.MIDDLE), Position(x,Rows.BOTTOM)]
-            for x in Cols
+        complete_cols = [
+            [Position(c, r) for r in Rows] for c in Cols
         ]
         diags = [
-            [Position(Cols.LEFT,Rows.TOP), Position(Cols.MIDDLE,Rows.MIDDLE), Position(Cols.RIGHT,Rows.BOTTOM)],
-            [Position(Cols.LEFT,Rows.BOTTOM), Position(Cols.MIDDLE,Rows.MIDDLE), Position(Cols.RIGHT,Rows.TOP)],
+            [Position(c, r) for c, r in zip(Cols, Rows)],
+            [Position(c, r) for c, r in zip(Cols, reversed(Rows))],
         ]
 
-        for positions in rows + cols + diags:
-            if all(pos in self.Xs for pos in positions):
+        for line in complete_rows + complete_cols + diags:
+            if all(pos in self.Xs for pos in line):
                 return 'X wins'
-            if all(pos in self.Os for pos in positions):
+            if all(pos in self.Os for pos in line):
                 return 'O wins'
         if len(self.Xs + self.Os) == 9:
             return 'draw'
